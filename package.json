@@ -5,5 +5,10 @@
   "main": "index.js",
   "repository": "git@git.webschuur.com:berkes/fundfissa.git",
   "author": "Bèr Kessels <ber@berk.es>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "create-react-app": "^3.0.0",
+    "drizzle": "^1.4.0",
+    "truffle": "^5.0.15"
+  }
 }
