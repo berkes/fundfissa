@@ -1,0 +1,9 @@
+{
+  "name": "fundfissa",
+  "version": "0.1.0",
+  "description": "Ethereum dApp to crowd source events ",
+  "main": "index.js",
+  "repository": "git@git.webschuur.com:berkes/fundfissa.git",
+  "author": "Bèr Kessels <ber@berk.es>",
+  "license": "MIT"
+}
