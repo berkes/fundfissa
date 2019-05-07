@@ -7,6 +7,7 @@
   "author": "Bèr Kessels <ber@berk.es>",
   "license": "MIT",
   "dependencies": {
+    "create-react-app": "^3.0.0",
     "drizzle": "^1.4.0",
     "truffle": "^5.0.15"
   }
