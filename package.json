@@ -5,5 +5,8 @@
   "main": "index.js",
   "repository": "git@git.webschuur.com:berkes/fundfissa.git",
   "author": "Bèr Kessels <ber@berk.es>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "drizzle": "^1.4.0"
+  }
 }
