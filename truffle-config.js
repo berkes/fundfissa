@@ -1,3 +1,5 @@
+const path = require("path"); // Needed for below src path
+
 /**
  * Use this file to configure your truffle project. It's seeded with some
  * common settings for different networks and features like migrations,
@@ -95,5 +97,9 @@ module.exports = {
       //  evmVersion: "byzantium"
       // }
     }
-  }
+  },
+
+  // BK: ensure we move the contracts into the client src directory,
+  // since react does not allow importing assets from outside its src directory.
+  contracts_build_directory: path.join(__dirname, "client/src/contracts")
 }
