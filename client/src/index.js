@@ -1,7 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import Banner from './Banner';
 import * as serviceWorker from './serviceWorker';
 
 // import drizzle functions and contract artifact
@@ -21,9 +20,10 @@ import { Drizzle } from "drizzle";
 //};
 
 // setup drizzle
-const drizzle = new Drizzle(options);
+//const drizzle = new Drizzle(options);
+const drizzle = null;
 
-ReactDOM.render(<App drizzle={drizzle} />, document.getElementById('root'));
+ReactDOM.render(<Banner drizzle={drizzle} />, document.getElementById('banner'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
