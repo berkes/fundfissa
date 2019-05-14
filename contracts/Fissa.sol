@@ -1,14 +1,18 @@
-pragma solidity ^0.5.0;
+pragma solidity ^0.5.7;
 
 contract Fissa {
-  string public eventName; 
+  string public eventName = ""; 
+  uint public startsAt = 0;
+  uint public ticketPrice = 0;
+  uint public threshold = 0;
 
-  constructor(string memory _eventName) public {
+  constructor(string memory _eventName,
+              uint _startsAt,
+              uint _ticketPrice,
+              uint _threshold) public {
     eventName = _eventName;
-  }
-
-  function setName(string memory _eventName) public returns (bool) {
-    eventName = _eventName;
-    return true;
+    startsAt = _startsAt;
+    ticketPrice = _ticketPrice;
+    threshold = _threshold;
   }
 }
