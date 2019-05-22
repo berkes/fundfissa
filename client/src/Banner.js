@@ -1,71 +1,57 @@
 import React from 'react';
+import moment from 'moment';
 
+// Component renders the banner with the ticking clock.
+// Maintains state only for the clock.
 class Banner extends React.Component {
-  state = {
-    loading: true,
+  static defaultProps = {
     startsAt: 0,
-    remaining: null,
+    eventName: "",
+    remaining: { 
+      'total': 0,
+      'days': 0,
+      'hours': 0,
+      'minutes': 0,
+      'seconds': 0
+    }
+  }
+
+  constructor(props) {
+    super(props)
+    this.state = { remaining: this.getTimeRemaining(this.props.startsAt)  }
   }
 
   componentDidMount() {
-    const { drizzle } = this.props;
-    const contract = drizzle.contracts.Fissa;
-    const eventNameKey = contract.methods["eventName"].cacheCall();
-
-    // TODO: replace with new Date(contract.eventStartsAt * 1000)
-    // date --date="2019-06-06 22:00" +%s
-    var startsAt = new Date(1559851200 * 1000);
-
-    this.setState({
-      loading: false,
-      remaining: this.getTimeRemaining(startsAt),
-      startsAt: startsAt,
-      eventNameKey: eventNameKey
-    });
-
     this.timerID = setInterval(() => this.tick(), 1000);
   }
 
   componentWillUnmount() {
-    this.unsubscribe();
     clearInterval(this.timerID);
   }
 
   tick() {
-    this.setState({ remaining: this.getTimeRemaining(this.state.startsAt) })
+    this.setState({ remaining: this.getTimeRemaining(this.props.startsAt) })
   }
 
   getTimeRemaining(endtime) {
-    var t = Date.parse(endtime) - Date.parse(new Date());
-    var seconds = Math.floor((t / 1000) % 60);
-    var minutes = Math.floor((t / 1000 / 60) % 60);
-    var hours = Math.floor((t / (1000 * 60 * 60)) % 24);
-    var days = Math.floor(t / (1000 * 60 * 60 * 24));
+    var now = moment(new Date());
+    var end = moment.unix(endtime);
+    if (end.isSameOrAfter(now)) {
+      return this.props.remaining;
+    }
+    var remaining = moment.duration(now.diff(end));
     return {
-      'total': t,
-      'days': days,
-      'hours': hours,
-      'minutes': minutes,
-      'seconds': seconds
+      'total': remaining,
+      'days': remaining.days(),
+      'hours': remaining.hours(),
+      'minutes': remaining.minutes(),
+      'seconds': remaining.seconds()
     };
   }
 
-  getContractVar(name, key) {
-    const { Fissa } = this.props.drizzleState.contracts;
-    console.log(Fissa);
-    if (Fissa[name] && Fissa[name][key]) {
-      return Fissa[name][key].value;
-    } else {
-      return "";
-    }
-  }
-
   render() {
-    if(this.state.loading) return(<h1>Loading Blockchain...</h1>);
-
-    // store var in a shortcut to avoid having to type this.state everytime
-    const remaining = this.state.remaining;
-    const eventName = this.getContractVar("eventName", this.state.eventNameKey)
+    const { remaining } = this.state;
+    const { eventName } = this.props;
 
     return(
     <section className="banner-area relative" id="home">

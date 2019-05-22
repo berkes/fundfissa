@@ -4,37 +4,44 @@ import Banner from './Banner';
 class App extends React.Component {
   state = {
     loading: true,
-    drizzleState: null
+    eventNameKey: "",
+    startsAtKey: "",
   }
+
+  //new Date(1559851200 * 1000),
 
   componentDidMount() {
     const { drizzle } = this.props;
+    const contract = drizzle.contracts.Fissa;
 
-    this.unsubscribe = drizzle.store.subscribe(() => {
-      // Wait for the store to become ready, then update local component
-      const drizzleState = drizzle.store.getState();
-      if (drizzleState.drizzleStatus.initialized) {
-        this.setState({
-          loading: false,
-          drizzleState:  drizzleState,
-        });
-      }
-    });
+    const eventNameKey = contract.methods["eventName"].cacheCall();
+    const startsAtKey = contract.methods["startsAt"].cacheCall();
+    this.setState({ eventNameKey, startsAtKey })
   }
 
-  componentWillUnmount() {
-    this.unsubscribe();
+  getContractVar(name, key) {
+    const { Fissa } = this.props.drizzleState.contracts;
+    if (Fissa[name] && Fissa[name][key]) {
+      return Fissa[name][key].value;
+    } else {
+      return "";
+    }
   }
 
   render() {
-    if (this.state.loading) return "Loading blockchain...";
-    return(
-      <Banner
-        drizzle={this.props.drizzle}
-        drizzleState={this.state.drizzleState}
-      />
-    );
-//ReactDOM.render(<Crowdfunder drizzle={drizzle} />, document.getElementById('crowdfunder'));
+    var eventName = this.getContractVar("eventName", this.state.eventNameKey)
+    var startsAt = this.getContractVar("startsAt", this.state.startsAtKey)
+    if (startsAt && eventName) {
+      return(
+        <Banner
+          eventName={eventName}
+          startsAt={startsAt}
+        />
+      );
+    } else {
+      console.log(startsAt, eventName)
+      return <h1>loading contract</h1>
+    }
   }
 }
 
