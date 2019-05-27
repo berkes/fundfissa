@@ -61,32 +61,6 @@ contract("Fissa", accounts => {
     });
   })
 
-  describe('expired', async () => {
-    let fissa = null;
-
-    before(async () => {
-      let latest = await time.latest()
-      fissa = await Fissa.new(
-        eventName,
-        latest.add(time.duration.seconds(10)),
-        ticketPrice,
-        threshold
-      );
-      await time.increase(time.duration.seconds(12));
-    });
-
-    it('is expired', async () => {
-      var startsAt = await fissa.startsAt.call();
-      var blockTime = await time.latest();
-      // This means the current timestamp has passed the startsAt
-      expect(blockTime).to.be.bignumber.gt(startsAt);
-    });
-
-    it('reports to be expired', async () => {
-      expect(await fissa.isExpired.call()).to.be.true
-    })
-  });
-
   describe('purchase', async () => {
     let fissa = null;
 
@@ -146,6 +120,39 @@ contract("Fissa", accounts => {
       expectEvent.inLogs(logs, 'Purchase', { purchaser: roles.buyer });
     });
   }); // purchase
+
+  describe('isExpired', async () => {
+    let fissa = null;
+
+    before(async () => {
+      let latest = await time.latest()
+      fissa = await Fissa.new(
+        eventName,
+        latest.add(time.duration.seconds(10)),
+        ticketPrice,
+        threshold
+      );
+      await time.increase(time.duration.seconds(12));
+    });
+
+    it('is expired', async () => {
+      var startsAt = await fissa.startsAt.call();
+      var blockTime = await time.latest();
+      // This means the current timestamp has passed the startsAt
+      expect(blockTime).to.be.bignumber.gt(startsAt);
+    });
+
+    it('reports to be expired', async () => {
+      expect(await fissa.isExpired.call()).to.be.true
+    });
+
+    it('no longer allows purchase()ing', async () => {
+      await expectRevert(
+        fissa.purchase({ from: roles.buyer, value: ticketPrice }),
+        "Expired"
+      )
+    });
+  }); // isexpired
 
   describe('isFunded', function () {
     let fissa = null;

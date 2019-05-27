@@ -36,6 +36,7 @@ contract Fissa {
 
   function purchase() public payable {
     require(msg.value == ticketPrice, "TicketPriceMismatch");
+    require(! isExpired(), "Expired");
 
     balances[msg.sender] += msg.value;
     emit Purchase(msg.sender);
