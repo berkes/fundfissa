@@ -7,8 +7,10 @@
   "author": "Bèr Kessels <ber@berk.es>",
   "license": "MIT",
   "dependencies": {
+    "chai": "^4.2.0",
     "create-react-app": "^3.0.0",
     "drizzle": "^1.4.0",
+    "openzeppelin-test-helpers": "^0.4.0",
     "truffle": "^5.0.15"
   },
   "devDependencies": {

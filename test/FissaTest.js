@@ -1,13 +1,19 @@
 const Fissa = artifacts.require("./Fissa.sol");
+const { expect } = require('chai');
+const { BN,
+        constants,
+        expectEvent,
+        expectRevert,
+        time } = require('openzeppelin-test-helpers');
 
 contract("Fissa", accounts => {
+  let eventName = "Huisfeest";
+  let startsAt =  Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 5);
+  let ticketPriceInEth = 0.2;
+  let thresholdInEth = 1.2; //deliberately devidable by 0.2
+
   describe("deploy", () => {
     let fissa = null;
-
-    let eventName = "Huisfeest";
-    let startsAt =  Math.floor(Date.now() / 1000) + (60 * 60 * 24 * 5);
-    let ticketPriceInEth = 0.2;
-    let thresholdInEth = 1.2; //deliberately devidable by 0.2
 
     before(async () => {
       fissa = await Fissa.new(
@@ -38,4 +44,26 @@ contract("Fissa", accounts => {
       assert.equal(web3.utils.fromWei(actualThreshold), thresholdInEth);
     })
   })
+
+  describe('expired', async () => {
+    let fissa = null;
+
+    before(async () => {
+      let latest = await time.latest()
+      fissa = await Fissa.new(
+        eventName,
+        latest.add(time.duration.seconds(10)),
+        web3.utils.toWei(ticketPriceInEth.toString()),
+        web3.utils.toWei(thresholdInEth.toString())
+      );
+      await time.increase(time.duration.seconds(12));
+    });
+
+    it('is expired', async () => {
+      var startsAt = await fissa.startsAt.call();
+      var blockTime = await time.latest();
+      // This means the current timestamp has passed the startsAt
+      expect(blockTime).to.be.bignumber.gt(startsAt);
+    });
+  });
 });
