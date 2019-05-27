@@ -146,4 +146,27 @@ contract("Fissa", accounts => {
       expectEvent.inLogs(logs, 'Purchase', { purchaser: roles.buyer });
     });
   }); // purchase
+
+  describe('isFunded', function () {
+    let fissa = null;
+    before(async () => {
+      fissa = await Fissa.new(
+        eventName,
+        startsAt,
+        ticketPrice,
+        ticketPrice.muln(2) // Set threshold to ticketPrice so 2 purchases fund it.
+      );
+    });
+
+    it('is false when threshold is not met', async () => {
+      await fissa.purchase({ from: roles.buyer, value: ticketPrice });
+      expect(await fissa.isFunded.call()).to.be.false
+    });
+
+    // NOTE: regardless of isExpired state!
+    it('is true when threshold is met', async () => {
+      await fissa.purchase({ from: roles.buyer, value: ticketPrice });
+      expect(await fissa.isFunded.call()).to.be.true
+    });
+  }); // isFunded
 });

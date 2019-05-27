@@ -26,6 +26,10 @@ contract Fissa {
     return startsAt < now;
   }
 
+  function isFunded() public view returns(bool) {
+    return address(this).balance >= threshold;
+  }
+
   function participants(address participant) public view returns(uint) {
     return balances[participant] / ticketPrice;
   }
