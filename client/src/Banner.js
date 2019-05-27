@@ -36,10 +36,10 @@ class Banner extends React.Component {
   getTimeRemaining(endtime) {
     var now = moment(new Date());
     var end = moment.unix(endtime);
-    if (end.isSameOrAfter(now)) {
+    if (end.isBefore(now)) {
       return this.props.remaining;
     }
-    var remaining = moment.duration(now.diff(end));
+    var remaining = moment.duration(end.diff(now));
     return {
       'total': remaining,
       'days': remaining.days(),
@@ -57,7 +57,7 @@ class Banner extends React.Component {
     <section className="banner-area relative" id="home">
       <div className="overlay overlay-bg"></div>
       <div className="container">
-        <div className="row fullscreen align-items-center justify-content-center">
+        <div className="row fullscreen align-items-center justify-content-center" style={{ height: "478px" }}>
           <div className="banner-content col-lg-6 col-md-12" id="banner">
             <h1>
             <strong>{eventName}</strong> starts in

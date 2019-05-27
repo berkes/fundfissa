@@ -1,50 +1,66 @@
 import React from 'react';
+import { utils } from 'web3';
 import moment from 'moment';
 
 class Crowdfunder extends React.Component { 
+  static defaultProps = {
+    startsAt: 0,
+    eventName: "",
+    ticketPrice: 0,
+    threshold: 0,
+
+    fundTotal: 0,
+    percentage: 0,
+    ticketsLeft: 0,
+  }
+
   constructor(props) {
     super(props);
+    var startsAtDate = moment.unix(props.startsAt);
+    var timeLeft = startsAtDate.toNow();
+    // TODO: use contract locked checker instead.
+    var isLocked = moment().isAfter(startsAtDate);
 
-    const deadline = moment.unix(1559851200);
-
-    // TODO: replace with actual contract values
-    this.state = {
-      fundTotal: 24,
-      threshold: 1337,
-      percentage: Math.floor((24 / 1337) * 100),
-      deadline: deadline,
-      ticketPrice: 12,
-      timeLeft: moment(deadline).toNow(true),
-      ticketsLeft: Math.ceil(1337/12) - (24/12),
-      isLocked: false,
+    this.state = { 
+      ticketPriceEth: utils.fromWei(props.ticketPrice),
+      thresholdEth: utils.fromWei(props.threshold),
+      ticketsLeft: Math.floor(props.threshold / props.ticketPrice),
+      timeLeft: timeLeft,
+      isLocked: isLocked
     }
   }
 
   render() {
+    const { startsAt, eventName, fundTotal } = this.props;
+    const { ticketPriceEth, thresholdEth, timeLeft, isLocked, ticketsLeft } = this.state;
+
     return(
-      <div className="col-md-8 pb-80 header-text">
+      <section id="form" className="facilities-area section-gap"><div className="container"><div className="row align-items-center justify-content-center"><div className="col-md-8 pb-80 header-text">
         <h1>
           <span className="lnr lnr-rocket"></span>&nbsp;
-          Ξ{this.state.fundTotal} of Ξ{this.state.threshold} funded
+          ETH {fundTotal} of ETH {Number.parseFloat(thresholdEth).toFixed(2)} funded
         </h1>
         <p>
           <span className="lnr lnr-hourglass"></span>&nbsp;
-          Less than <strong>{this.state.timeLeft} left</strong> to fund this fissa!
+          { isLocked ?
+            (<strong>Time is up!</strong>) :
+            (<span>Less than <strong>{timeLeft}</strong> left to fund this fissa!</span>)
+          }
         </p>
         <p>
           <br/>
-          { this.state.isLocked ?
+          { isLocked ?
              (<button className="nw-btn primary-btn">Download Ticket <span className="lnr lnr-download"></span></button>) :
              (<button className="nw-btn primary-btn">
-                Buy your ticket for <strong>Ξ{this.state.ticketPrice}</strong>
+                Buy your ticket for <strong>Ξ{ticketPriceEth}</strong>
                 <span className="lnr lnr-cart"></span>
               </button>)
           }
         </p>
         <p>
-          Only {this.state.ticketsLeft} tickets left!
+          {ticketsLeft} tickets left!
         </p>
-      </div>
+      </div></div></div></section>
     )
   }
 }

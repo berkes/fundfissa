@@ -1,22 +1,29 @@
 import React from 'react';
 import Banner from './Banner';
+import Crowdfunder from './Crowdfunder';
 
 class App extends React.Component {
   state = {
     loading: true,
-    eventNameKey: "",
-    startsAtKey: "",
+    keys: {},
   }
 
-  //new Date(1559851200 * 1000),
+  contractAttrs = [
+    "eventName",
+    "startsAt",
+    "ticketPrice",
+    "threshold",
+  ]
 
   componentDidMount() {
     const { drizzle } = this.props;
     const contract = drizzle.contracts.Fissa;
+    var keys = {};
 
-    const eventNameKey = contract.methods["eventName"].cacheCall();
-    const startsAtKey = contract.methods["startsAt"].cacheCall();
-    this.setState({ eventNameKey, startsAtKey })
+    this.contractAttrs.forEach((name) => {
+      keys[name] = contract.methods[name].cacheCall();
+    });
+    this.setState({ keys: keys })
   }
 
   getContractVar(name, key) {
@@ -24,23 +31,35 @@ class App extends React.Component {
     if (Fissa[name] && Fissa[name][key]) {
       return Fissa[name][key].value;
     } else {
-      return "";
+      return null;
     }
   }
 
   render() {
-    var eventName = this.getContractVar("eventName", this.state.eventNameKey)
-    var startsAt = this.getContractVar("startsAt", this.state.startsAtKey)
-    if (startsAt && eventName) {
-      return(
-        <Banner
-          eventName={eventName}
-          startsAt={startsAt}
-        />
-      );
-    } else {
-      console.log(startsAt, eventName)
+    var reader = {}
+
+    this.contractAttrs.forEach((name) => {
+      reader[name] = this.getContractVar(name, this.state.keys[name]);
+    });
+    var hasNullValues = Object.values(reader).some(v => (v === null));
+
+    if (hasNullValues) {
       return <h1>loading contract</h1>
+    } else {
+      return(
+        <React.Fragment>
+          <Banner
+            eventName={reader.eventName}
+            startsAt={reader.startsAt}
+          />
+          <Crowdfunder
+            eventName={reader.eventName}
+            startsAt={reader.startsAt}
+            ticketPrice={reader.ticketPrice}
+            threshold={reader.threshold}
+          />
+        </React.Fragment>
+      );
     }
   }
 }
