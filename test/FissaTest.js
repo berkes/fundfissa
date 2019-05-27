@@ -65,5 +65,9 @@ contract("Fissa", accounts => {
       // This means the current timestamp has passed the startsAt
       expect(blockTime).to.be.bignumber.gt(startsAt);
     });
+
+    it('reports to be expired', async () => {
+      expect(await fissa.isExpired.call()).to.be.true
+    })
   });
 });

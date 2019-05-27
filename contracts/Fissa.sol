@@ -15,4 +15,8 @@ contract Fissa {
     ticketPrice = _ticketPrice;
     threshold = _threshold;
   }
+
+  function isExpired() public view returns(bool) {
+    return startsAt < now;
+  }
 }
