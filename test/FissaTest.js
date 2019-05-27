@@ -54,6 +54,11 @@ contract("Fissa", accounts => {
       expect(await fissa.participants.call(constants.ZERO_ADDRESS)).
         to.be.bignumber.equal('0')
     });
+
+    it('has a balances map', async () => {
+      expect(await fissa.balances.call(constants.ZERO_ADDRESS)).
+        to.be.bignumber.equal('0')
+    });
   })
 
   describe('expired', async () => {
@@ -103,6 +108,12 @@ contract("Fissa", accounts => {
       // We have 1 from previous testcase. Yes. This sucks ¯\_(ツ)_/¯.
       await fissa.purchase({ from: roles.buyer, value: ticketPrice });
       expect(await fissa.participants(roles.buyer)).to.be.bignumber.equal('2');
+    });
+
+    it('increments buyer balance', async () => {
+      // We have 2 from previous testcase.
+      await fissa.purchase({ from: roles.buyer, value: ticketPrice });
+      expect(await fissa.balances(roles.buyer)).to.be.bignumber.equal((3 * ticketPrice).toString());
     });
 
     it('transfers ether from buyer into the contract', async () => {

@@ -8,7 +8,7 @@ contract Fissa {
 
   // @dev: we have a severe security issue here, if we don't explicitely
   //       check the uint8 size on setting it.
-  mapping(address => uint8) public participants;
+  mapping(address => uint) public balances;
 
   event Purchase(address purchaser);
 
@@ -26,10 +26,14 @@ contract Fissa {
     return startsAt < now;
   }
 
+  function participants(address participant) public view returns(uint) {
+    return balances[participant] / ticketPrice;
+  }
+
   function purchase() public payable {
     require(msg.value == ticketPrice, "TicketPriceMismatch");
 
-    participants[msg.sender] += 1;
+    balances[msg.sender] += msg.value;
     emit Purchase(msg.sender);
   }
 }
