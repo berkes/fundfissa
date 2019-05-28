@@ -80,6 +80,14 @@ module.exports = {
       // network_id: 2111,   // This network is yours, in the cloud.
       // production: true    // Treats this network as if it was a public net. (default: false)
     // }
+    rinkeby: {
+      host: "localhost",
+      port: 8545, // geth
+      from: "0xFBf18ab7390073e8d423BA21Ee457711898A78B2",
+      network_id: 4,
+      gas: 600000, // Gas limit for deploys. See https://rinkeby.etherscan.io/blocks
+      //gas: 7006834 // Gas limit for deploys. See https://rinkeby.etherscan.io/blocks
+    }
   },
 
   // Set default mocha options here, use special reporters etc.
