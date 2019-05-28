@@ -6,6 +6,10 @@ class App extends React.Component {
   state = {
     loading: true,
     keys: {},
+    purchase: () => {},
+    txHash: null,
+    txStatus: "",
+    fundTotal: 0,
   }
 
   contractAttrs = [
@@ -18,12 +22,39 @@ class App extends React.Component {
   componentDidMount() {
     const { drizzle } = this.props;
     const contract = drizzle.contracts.Fissa;
-    var keys = {};
+      console.log(drizzle);
 
+    // TODO: use drizzle and redux to manage and passthe state instead of web3
+    const purchase = function(e) {
+      e.preventDefault();
+
+      const web3 = drizzle.web3;
+      const price = state.contracts.Fissa.ticketPrice["0x0"].value;
+      const purchaseId = contract.methods.purchase.cacheSend({ value: price });
+      console.log(price);
+      if (state.transactionStack[purchaseId]) {
+        const txHash = state.transactionStack[purchaseId];
+        const txStatus = state.transactions[txHash].status;
+        console.log(txHash, txStatus);
+        this.setState({ txHash, txStatus });
+      }
+    }
+
+    drizzle.web3.eth.getBalance(contract.address).then((balance) => {
+      this.setState({fundTotal: balance})
+    })
+
+    var keys = {};
     this.contractAttrs.forEach((name) => {
       keys[name] = contract.methods[name].cacheCall();
     });
-    this.setState({ keys: keys })
+
+    this.setState({
+      contract: contract,
+      keys: keys,
+      purchase: purchase,
+      fundTotal: 10000000,
+    })
   }
 
   getContractVar(name, key) {
@@ -36,10 +67,11 @@ class App extends React.Component {
   }
 
   render() {
-    var reader = {}
+    const { contract, keys, purchase, fundTotal } = this.state;
 
+    var reader = {}
     this.contractAttrs.forEach((name) => {
-      reader[name] = this.getContractVar(name, this.state.keys[name]);
+      reader[name] = this.getContractVar(name, keys[name]);
     });
     var hasNullValues = Object.values(reader).some(v => (v === null));
 
@@ -49,14 +81,17 @@ class App extends React.Component {
       return(
         <React.Fragment>
           <Banner
+            contract={contract}
             eventName={reader.eventName}
             startsAt={reader.startsAt}
           />
           <Crowdfunder
+            purchase={purchase}
             eventName={reader.eventName}
             startsAt={reader.startsAt}
             ticketPrice={reader.ticketPrice}
             threshold={reader.threshold}
+            fundTotal={fundTotal}
           />
         </React.Fragment>
       );

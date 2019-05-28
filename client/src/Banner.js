@@ -51,7 +51,7 @@ class Banner extends React.Component {
 
   render() {
     const { remaining } = this.state;
-    const { eventName } = this.props;
+    const { eventName, contract } = this.props;
 
     return(
     <section className="banner-area relative" id="home">
@@ -60,7 +60,7 @@ class Banner extends React.Component {
         <div className="row fullscreen align-items-center justify-content-center" style={{ height: "478px" }}>
           <div className="banner-content col-lg-6 col-md-12" id="banner">
             <h1>
-            <strong>{eventName}</strong> starts in
+              <strong>{eventName}</strong> starts in
             </h1>
             <div className="row clock_sec d-flex flex-row justify-content-between" id="clockdiv">
               <div className="clockinner">
@@ -80,6 +80,7 @@ class Banner extends React.Component {
                 <div className="smalltext">Seconds</div>
               </div>
             </div>
+            <p><a className="text-light bg-dark" href={ "https://rinkeby.etherscan.io/address/" + contract.address }>view contract</a></p>
           </div>
         </div>
       </div>
