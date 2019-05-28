@@ -1,0 +1,23 @@
+{
+  "name": "fundfissa",
+  "version": "0.1.0",
+  "description": "Ethereum dApp to crowd source events ",
+  "main": "index.js",
+  "repository": "git@git.webschuur.com:berkes/fundfissa.git",
+  "author": "Bèr Kessels <ber@berk.es>",
+  "license": "MIT",
+  "dependencies": {
+    "chai": "^4.2.0",
+    "create-react-app": "^3.0.0",
+    "drizzle": "^1.4.0",
+    "openzeppelin-test-helpers": "^0.4.0",
+    "truffle": "^5.0.15"
+  },
+  "devDependencies": {
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "babel-register": "^6.26.0"
+  }
+}
