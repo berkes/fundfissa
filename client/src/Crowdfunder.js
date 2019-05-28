@@ -2,6 +2,8 @@ import React from 'react';
 import { utils } from 'web3';
 import moment from 'moment';
 
+import TransactionReport from './TransactionReport'
+
 class Crowdfunder extends React.Component { 
   static defaultProps = {
     purchase: () => {},
@@ -23,7 +25,7 @@ class Crowdfunder extends React.Component {
     var isLocked = moment().isAfter(startsAtDate);
 
     // TODO: ask contract instead
-    var ticketsLeft = (props.threshold - props.fundTotal) / props.ticketPrice;
+    var ticketsLeft = Math.ceil((props.threshold - props.fundTotal) / props.ticketPrice);
 
     this.state = { 
       ticketPriceEth: utils.fromWei(props.ticketPrice),
@@ -36,32 +38,12 @@ class Crowdfunder extends React.Component {
   }
 
   render() {
-    const { purchase, startsAt, eventName, txHash, txStatus  } = this.props;
+    const { purchase, txHash, txStatus  } = this.props;
     const { ticketPriceEth, thresholdEth, timeLeft, isLocked, fundTotalEth, ticketsLeft } = this.state;
 
     return(
       <section id="form" className="facilities-area section-gap"><div className="container"><div className="row align-items-center justify-content-center"><div className="col-md-8 pb-80 header-text">
-        <div className="alert alert-warning" role="alert">
-          <h4 className="alert-heading">Thanks. But wait!</h4>
-          <p>
-            The transaction is pending. Once the transaction is mined, we know
-            if it was successfull (or failed), so hang on for a few more seconds.
-          </p>
-        </div>
-        <div className="alert alert-success" role="alert">
-          <h4 className="alert-heading">Success!</h4>
-          <p>
-            The transaction was <strong>successfull</strong><br/>
-            Thanks for your help with funding <strong>{eventName}</strong>!
-          </p>
-        </div>
-        <div className="alert alert-danger" role="alert">
-          <h4 className="alert-heading">Woops!</h4>
-          <p>
-            The transaction has <strong>failed</strong>, you do not have a ticket,
-            and your payment was reverted.
-          </p>
-        </div>
+        <TransactionReport txHash={txHash} txStatus={txStatus} />
         <h1>
           <span className="lnr lnr-rocket"></span>&nbsp;
           ETH {Number.parseFloat(fundTotalEth).toFixed(2)} of ETH {Number.parseFloat(thresholdEth).toFixed(2)} funded
@@ -81,7 +63,7 @@ class Crowdfunder extends React.Component {
                 <span className="lnr lnr-download"></span>
               </button>) :
              (<button onClick={purchase} className="nw-btn primary-btn">
-                Buy your ticket for <strong>Ξ{ticketPriceEth}</strong>
+                Buy your ticket for <strong>ETH {Number.parseFloat(ticketPriceEth).toFixed(2)}</strong>
                 <span className="lnr lnr-cart"></span>
               </button>)
           }

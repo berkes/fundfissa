@@ -22,23 +22,28 @@ class App extends React.Component {
   componentDidMount() {
     const { drizzle } = this.props;
     const contract = drizzle.contracts.Fissa;
-      console.log(drizzle);
 
     // TODO: use drizzle and redux to manage and passthe state instead of web3
     const purchase = function(e) {
       e.preventDefault();
 
-      const web3 = drizzle.web3;
-      const price = state.contracts.Fissa.ticketPrice["0x0"].value;
-      const purchaseId = contract.methods.purchase.cacheSend({ value: price });
-      console.log(price);
-      if (state.transactionStack[purchaseId]) {
-        const txHash = state.transactionStack[purchaseId];
-        const txStatus = state.transactions[txHash].status;
-        console.log(txHash, txStatus);
-        this.setState({ txHash, txStatus });
-      }
-    }
+      let price = drizzle.store.getState().contracts.Fissa.ticketPrice["0x0"].value;
+
+      drizzle.contracts.Fissa.methods.purchase().send({ value: price })
+        .on('transactionHash', (hash) => {
+          console.log("on transactionHash:", hash);
+          this.setState({ txHash: hash, txStatus: "pending" });
+        })
+        .on('confirmation', (confirmationNumber, receipt) => {
+          console.log(receipt);
+          console.log("on confirmation:", confirmationNumber);
+          this.setState({ txStatus: "confirmed" });
+        })
+        .on('error', (error) => {
+          console.error("on Error:", error);
+          this.setState({ txStatus: "failed" });
+        })
+    }.bind(this);
 
     drizzle.web3.eth.getBalance(contract.address).then((balance) => {
       this.setState({fundTotal: balance})
@@ -67,7 +72,7 @@ class App extends React.Component {
   }
 
   render() {
-    const { contract, keys, purchase, fundTotal } = this.state;
+    const { contract, keys, purchase, fundTotal, txHash, txStatus } = this.state;
 
     var reader = {}
     this.contractAttrs.forEach((name) => {
@@ -92,6 +97,8 @@ class App extends React.Component {
             ticketPrice={reader.ticketPrice}
             threshold={reader.threshold}
             fundTotal={fundTotal}
+            txHash={txHash}
+            txStatus={txStatus}
           />
         </React.Fragment>
       );
